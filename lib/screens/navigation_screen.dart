@@ -32,11 +32,11 @@ class NavigationScreen extends StatelessWidget {
         child: IconButton(
             onPressed: () {
               localData.clear();
-              Get.offAll(() => const HomeScreen());
+              Get.to(() => const HomeScreen());
             },
             icon: const Icon(
-              Icons.logout,
-              color: Colors.red,
+              Icons.create_new_folder,
+              color: accentColor,
             )),
       ),
       body: Obx(() => pages[myCtrl.activeIndex.value]),

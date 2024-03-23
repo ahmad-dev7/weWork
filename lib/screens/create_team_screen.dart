@@ -25,6 +25,11 @@ class CreateTeam extends StatelessWidget {
       );
       if (res == true) {
         Get.snackbar('Success', 'Team created');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: KMyText('Team code copied to clipboard'),
+          ),
+        );
         Get.offAll(
           () => const NavigationScreen(),
         );

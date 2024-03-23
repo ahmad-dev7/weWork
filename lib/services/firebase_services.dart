@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:myapp/constants/k_generate_code.dart';
 import 'package:myapp/controller/my_controller.dart';
 import 'package:myapp/model/created_teams.dart';
@@ -56,6 +57,7 @@ class FirebaseServices {
         var joinedTeams = teamsSnapshot.docs[0].data()['joinedTeams'];
 
         if (createdTeams.length > 0) {
+          myCtrl.userData.value.createdTeams = <CreatedTeams>[];
           for (var createdTeam in createdTeams) {
             myCtrl.userData.value.createdTeams!.add(
               CreatedTeams.fromJson(createdTeam),
@@ -64,6 +66,7 @@ class FirebaseServices {
         }
 
         if (joinedTeams.length > 0) {
+          myCtrl.userData.value.joinedTeams = <JoinedTeams>[];
           for (var joinedTeam in joinedTeams) {
             myCtrl.userData.value.joinedTeams!.add(
               JoinedTeams.fromJson(joinedTeam),
@@ -118,15 +121,14 @@ class FirebaseServices {
 
       await userDoc.reference.update({'createdTeams': currentData});
 
-      //! Error thing is happening right here
-      //! Null check operator used on a null value (this was the exception message)
-      //* createdTeams is null
       var teamsSnapshot = await userData
           .where('userId', isEqualTo: auth.currentUser!.uid)
           .get();
       print("---------------------- user id is assigned");
       var createdTeamData = teamsSnapshot.docs.first.data()['createdTeams'];
+
       myCtrl.userData.value.createdTeams = <CreatedTeams>[];
+
       print("---------------------- list of created teams assigned");
       for (var createdTeam in createdTeamData) {
         myCtrl.userData.value.createdTeams!.add(
@@ -134,6 +136,7 @@ class FirebaseServices {
         );
         print("---------------------- inserted created team");
       }
+      Clipboard.setData(ClipboardData(text: teamCode));
       //*
       return true;
     } catch (e) {
@@ -146,9 +149,20 @@ class FirebaseServices {
   Future<List<dynamic>> joinTeam(String teamCode) async {
     try {
       var query = await allTeams.where('teamCode', isEqualTo: teamCode).get();
+
       var teamDoc = query.docs.first;
-      if (teamDoc['ownerId'] != auth.currentUser!.uid ||
-          !teamDoc['members'].contains(auth.currentUser!.uid)) {
+      bool isJoined() {
+        bool isAlreadyJoined = false;
+        for (var member in teamDoc['members']) {
+          if (member['userId'] == auth.currentUser!.uid) {
+            isAlreadyJoined = true;
+            break;
+          }
+        }
+        return isAlreadyJoined;
+      }
+
+      if (teamDoc['ownerId'] != auth.currentUser!.uid && !isJoined()) {
         var currentMembers = teamDoc['members'];
         currentMembers.add({
           'name': auth.currentUser!.displayName,
@@ -169,7 +183,6 @@ class FirebaseServices {
           'projectDescription': teamDoc['projectDescription'],
           'teamCode': teamDoc['teamCode'],
           'ownerName': teamDoc['ownerName'],
-          'tasks': [],
         });
         await userDataDoc.reference.update({'joinedTeams': currentData});
 
@@ -180,6 +193,7 @@ class FirebaseServices {
             .get();
 
         var joinedTeamData = teamsSnapshot.docs.first['joinedTeams'];
+        myCtrl.userData.value.joinedTeams = <JoinedTeams>[];
         for (var joinedTeam in joinedTeamData) {
           myCtrl.userData.value.joinedTeams!.add(
             JoinedTeams.fromJson(joinedTeam),

@@ -14,19 +14,28 @@ class MyTasks extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              const KMyText('Created Teams', weight: FontWeight.bold),
+              const KVerticalSpace(height: 10),
               if (myCtrl.userData.value.createdTeams != null)
-                Obx(
-                  () => KMyText(
-                    myCtrl.userData.value.createdTeams!.last.teamName!,
+                for (var i = 0;
+                    i < myCtrl.userData.value.createdTeams!.length;
+                    i++)
+                  Obx(
+                    () => KMyText(
+                        myCtrl.userData.value.createdTeams![i].teamName!),
                   ),
-                ),
               const KVerticalSpace(),
+              const KMyText('Joined Teams', weight: FontWeight.bold),
+              const KVerticalSpace(height: 10),
               if (myCtrl.userData.value.joinedTeams != null)
-                Obx(
-                  () => KMyText(
-                    myCtrl.userData.value.joinedTeams![1].teamName!,
+                for (var i = 0;
+                    i < myCtrl.userData.value.joinedTeams!.length;
+                    i++)
+                  Obx(
+                    () => KMyText(
+                      myCtrl.userData.value.joinedTeams![i].teamName!,
+                    ),
                   ),
-                ),
             ],
           ),
         ),

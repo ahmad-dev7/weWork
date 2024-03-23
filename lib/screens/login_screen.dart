@@ -73,7 +73,6 @@ class LoginScreen extends StatelessWidget {
 
                   //* Login button
                   KCustomButton(
-                    color: Colors.black,
                     onTap: onLogin,
                     child: Obx(
                       () => Visibility(
