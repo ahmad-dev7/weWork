@@ -1,0 +1,20 @@
+Check if user's joined/created teams is empty,
+if it is then take user to create/join team page.
+
+else take user to home page and show details of the team.
+
+
+//
+maine jo team join kiya hai uska kya kya data mujhe chhaiye hoga?
+    first: team name
+    second: project name
+    third: project description
+    fourth: jo task mujhe assign hua hai us task ka data
+    fifth: total number of task of whole team
+    sixth: task owner name
+
+maine jo team create kiya hai uska kya kya data mujhe chhaiye hoga?
+    first: team name
+    second: project name
+    third: project description
+    fourth: pure task list ka data
