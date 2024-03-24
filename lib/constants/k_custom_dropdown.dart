@@ -1,9 +1,7 @@
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/constants/k_colors.dart';
 import 'package:myapp/constants/k_my_text.dart';
-
 class SelectDropdownButton extends StatelessWidget {
   final String buttonHint;
   final List<String> itemsList;
@@ -53,44 +51,32 @@ class SelectDropdownButton extends StatelessWidget {
         onChanged: (value) => onSelect(value!),
 
         // Dropdown button style
-        buttonStyleData: isBorderNeeded != null
-            ? ButtonStyleData(
-                elevation: 10,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      width: 0.7,
-                      color: Theme.of(context).primaryColor.withOpacity(0.4),
-                    ),
-                  ),
-                ),
-              )
-            : ButtonStyleData(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                height: 60,
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    width: 0.1,
-                    color: Theme.of(context).colorScheme.onBackground,
-                  ),
-                  color: cardColor,
-                ),
-              ),
+        buttonStyleData: ButtonStyleData(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          height: 60,
+          width: double.maxFinite,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              width: 0.1,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            color: backgroundColor.withOpacity(0.5),
+          ),
+        ),
 
         // Dropdown menu style
         dropdownStyleData: DropdownStyleData(
-          maxHeight: 250,
+          maxHeight: 100,
           decoration: BoxDecoration(
-            color: cardColor,
+            color: backgroundColor,
             borderRadius: BorderRadius.circular(8),
           ),
         ),
 
         // Menu items style
         menuItemStyleData: const MenuItemStyleData(
-          height: 50,
+          height: 40,
         ),
       ),
     );

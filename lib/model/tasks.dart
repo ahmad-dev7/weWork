@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myapp/model/members.dart';
 
 class Tasks {
   String? taskTitle;
   String? taskDescription;
-  String? assignedTo;
+  Members? assignedTo;
   Timestamp? dueDate;
   bool? isCompleted;
 
@@ -16,12 +17,20 @@ class Tasks {
   });
 
   factory Tasks.fromJson(Map<String, dynamic> json) {
+    var dueDate = DateTime.parse(json['dueDate']);
     return Tasks(
       taskTitle: json['taskTitle'],
       taskDescription: json['taskDescription'],
-      assignedTo: json['assignedTo'],
-      dueDate: json['dueDate'],
+      assignedTo: assignedToMember(json['assignedTo']),
+      dueDate: Timestamp.fromDate(dueDate),
       isCompleted: json['isCompleted'],
+    );
+  }
+
+  static assignedToMember(var json) {
+    return Members(
+      name: json.first['name'],
+      userId: json.first['userID'],
     );
   }
 }

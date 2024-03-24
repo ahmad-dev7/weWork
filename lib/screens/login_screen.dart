@@ -27,8 +27,7 @@ class LoginScreen extends StatelessWidget {
       );
       if (res == true) {
         Get.snackbar('Success', 'Signed-up successfully');
-        if (myCtrl.userData.value.createdTeams!.isNotEmpty ||
-            myCtrl.userData.value.joinedTeams!.isNotEmpty) {
+        if (myCtrl.createdTeams.isNotEmpty || myCtrl.joinedTeams.isNotEmpty) {
           Get.offAll(() => const NavigationScreen());
         } else {
           Get.offAll(() => const HomeScreen());

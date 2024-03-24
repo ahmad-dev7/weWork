@@ -5,10 +5,12 @@ import 'package:myapp/constants/k_generate_code.dart';
 import 'package:myapp/controller/my_controller.dart';
 import 'package:myapp/model/created_teams.dart';
 import 'package:myapp/model/joined_teams.dart';
+import 'package:myapp/model/members.dart';
+import 'package:myapp/model/teams.dart';
 import 'package:myapp/model/user_data.dart';
 
 class FirebaseServices {
-  // Collections
+  //* Collections
   var auth = FirebaseAuth.instance;
   var userData = FirebaseFirestore.instance.collection('userData');
   var allTeams = FirebaseFirestore.instance.collection('allTeams');
@@ -28,6 +30,10 @@ class FirebaseServices {
           'name': name,
           'userId': credential.user!.uid
         });
+        myCtrl.userData.value = UserData(
+          name: name,
+          userId: credential.user!.uid,
+        );
         localData.put('name', name);
         localData.put('userId', credential.user!.uid);
         return true;
@@ -56,22 +62,31 @@ class FirebaseServices {
         var createdTeams = teamsSnapshot.docs[0].data()['createdTeams'];
         var joinedTeams = teamsSnapshot.docs[0].data()['joinedTeams'];
 
-        if (createdTeams.length > 0) {
-          myCtrl.userData.value.createdTeams = <CreatedTeams>[];
-          for (var createdTeam in createdTeams) {
-            myCtrl.userData.value.createdTeams!.add(
-              CreatedTeams.fromJson(createdTeam),
-            );
-          }
-        }
-
+        // Joined Teams
         if (joinedTeams.length > 0) {
-          myCtrl.userData.value.joinedTeams = <JoinedTeams>[];
+          myCtrl.joinedTeams.value = <JoinedTeams>[];
           for (var joinedTeam in joinedTeams) {
-            myCtrl.userData.value.joinedTeams!.add(
+            myCtrl.joinedTeams.add(
               JoinedTeams.fromJson(joinedTeam),
             );
           }
+          myCtrl.currentTeamCode.value = myCtrl.joinedTeams.first.teamCode!;
+          await getTeamData(myCtrl.currentTeamCode.value);
+          print('-----------------------------------');
+          print('called joined team with: ${myCtrl.currentTeamCode.value}');
+        }
+
+        // Created Teams
+        if (createdTeams.length > 0) {
+          for (var createdTeam in createdTeams) {
+            myCtrl.createdTeams.add(
+              CreatedTeams.fromJson(createdTeam),
+            );
+          }
+          myCtrl.currentTeamCode.value = myCtrl.createdTeams.first.teamCode!;
+          await getTeamData(myCtrl.currentTeamCode.value);
+          print('-----------------------------------');
+          print('called created team with: ${myCtrl.currentTeamCode.value}');
         }
 
         localData.put('name', credential.user!.displayName);
@@ -106,11 +121,21 @@ class FirebaseServices {
         'tasks': [],
       });
 
-      var query = await userData
+      var query = await allTeams.where('teamCode', isEqualTo: teamCode).get();
+      var membersDoc = query.docs.first;
+      List<dynamic> members = membersDoc['members'];
+      members.add({
+        'name': auth.currentUser!.displayName,
+        'userId': auth.currentUser!.uid,
+      });
+
+      await membersDoc.reference.update({'members': members});
+
+      var userDataQuery = await userData
           .where('userId', isEqualTo: auth.currentUser!.uid)
           .get();
 
-      var userDoc = query.docs.first;
+      var userDoc = userDataQuery.docs.first;
       List<dynamic> currentData = userDoc['createdTeams'];
       currentData.add({
         'teamName': teamName,
@@ -124,18 +149,16 @@ class FirebaseServices {
       var teamsSnapshot = await userData
           .where('userId', isEqualTo: auth.currentUser!.uid)
           .get();
-      print("---------------------- user id is assigned");
       var createdTeamData = teamsSnapshot.docs.first.data()['createdTeams'];
 
-      myCtrl.userData.value.createdTeams = <CreatedTeams>[];
-
-      print("---------------------- list of created teams assigned");
+      myCtrl.createdTeams.value = <CreatedTeams>[];
       for (var createdTeam in createdTeamData) {
-        myCtrl.userData.value.createdTeams!.add(
+        myCtrl.createdTeams.add(
           CreatedTeams.fromJson(createdTeam),
         );
-        print("---------------------- inserted created team");
       }
+      myCtrl.currentTeamCode.value = teamCode;
+      getTeamData(teamCode);
       Clipboard.setData(ClipboardData(text: teamCode));
       //*
       return true;
@@ -193,13 +216,14 @@ class FirebaseServices {
             .get();
 
         var joinedTeamData = teamsSnapshot.docs.first['joinedTeams'];
-        myCtrl.userData.value.joinedTeams = <JoinedTeams>[];
+        myCtrl.joinedTeams.value = <JoinedTeams>[];
         for (var joinedTeam in joinedTeamData) {
-          myCtrl.userData.value.joinedTeams!.add(
+          myCtrl.joinedTeams.add(
             JoinedTeams.fromJson(joinedTeam),
           );
         }
-
+        myCtrl.currentTeamCode.value = teamCode;
+        await getTeamData(teamCode);
         return [true, 'Joined team successfully'];
       } else {
         return [false, 'You are already in this team'];
@@ -209,4 +233,55 @@ class FirebaseServices {
       return [false, "Failed to join team"];
     }
   }
+
+  //* Team Data
+  Future getTeamData(String teamCode) async {
+    print('Reached here---------------');
+    try {
+      var query = await allTeams.where('teamCode', isEqualTo: teamCode).get();
+
+      myCtrl.currentTeam.value = Teams.fromJson(query.docs.first.data());
+      print('assigned value to current team');
+      print('--------------------------');
+      print('current team name: ${myCtrl.currentTeam.value.teamName}');
+      return;
+    } catch (exception) {
+      print(exception);
+    }
+  }
+
+  //* Create Task
+  Future<bool> createTask(String title, String description, Members assignedTo,
+      String dueDate) async {
+    try {
+      var teamCode = myCtrl.currentTeamCode.value;
+      var teamData =
+          await allTeams.where('teamCode', isEqualTo: teamCode).get();
+
+      var teamDoc = teamData.docs.first;
+      var tasks = teamDoc['tasks'];
+
+      tasks.add({
+        'title': title,
+        'description': description,
+        'assignedTo': [
+          {
+            'name': assignedTo.name,
+            'userId': assignedTo.userId,
+          }
+        ],
+        'dueDate': dueDate,
+        'isCompleted': false,
+      });
+
+      await teamDoc.reference.update({'tasks': tasks});
+
+      return true;
+    } catch (exception) {
+      print(exception);
+      return false;
+    }
+  }
+
+  //
 }
