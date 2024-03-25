@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:intl/intl.dart';
 import 'package:myapp/constants/k_colors.dart';
+import 'package:myapp/constants/k_format_date.dart';
 import 'package:myapp/constants/k_my_text.dart';
 import 'package:myapp/controller/my_controller.dart';
 
@@ -10,10 +10,6 @@ class DueDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String kFormatDate(DateTime dateTime) {
-      return DateFormat('dd/MM/yyyy').format(dateTime);
-    }
-
     return Expanded(
       flex: 2,
       child: InkWell(

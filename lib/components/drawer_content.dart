@@ -1,11 +1,19 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:myapp/constants/k_colors.dart';
 import 'package:myapp/constants/k_custom_space.dart';
 import 'package:myapp/constants/k_my_text.dart';
+import 'package:myapp/constants/k_team_chip.dart';
+import 'package:myapp/constants/k_title_chip.dart';
 import 'package:myapp/controller/my_controller.dart';
+import 'package:myapp/model/created_teams.dart';
+import 'package:myapp/model/joined_teams.dart';
+import 'package:myapp/model/teams.dart';
+import 'package:myapp/model/user_data.dart';
 import 'package:myapp/screens/home_screen.dart';
+import 'package:myapp/screens/login_screen.dart';
 
 class DrawerContent extends StatelessWidget {
   const DrawerContent({super.key});
@@ -20,6 +28,16 @@ class DrawerContent extends StatelessWidget {
           FirebaseAuth.instance.currentUser!.uid;
       debugPrint('Is OWner of this team: ${myCtrl.isOwner}');
       myCtrl.showLoading.value = false;
+    }
+
+    onLogout() {
+      myCtrl.userData.value = UserData();
+      myCtrl.createdTeams.value = <CreatedTeams>[];
+      myCtrl.joinedTeams.value = <JoinedTeams>[];
+      myCtrl.currentTeam.value = Teams();
+      localData.clear();
+      myCtrl.dispose();
+      Get.offAll(() => const LoginScreen());
     }
 
     return SafeArea(
@@ -56,61 +74,44 @@ class DrawerContent extends StatelessWidget {
                 ),
                 const KVerticalSpace(),
                 // Create team text
-                const KMyText(
-                  'Your created teams',
-                  color: accentColor,
-                  weight: FontWeight.bold,
-                  size: 20,
+                const KTitleChip(
+                  label: 'My Created times',
+                  iconData: Icons.person,
                 ),
                 for (var i = 0; i < myCtrl.createdTeams.length; i++)
-                  Obx(
-                    () => InkWell(
-                      onTap: () async {
-                        await onSelect(myCtrl.createdTeams[i].teamCode!);
-                        myCtrl.currentTeamCode.value =
-                            myCtrl.createdTeams[i].teamCode!;
-                        Get.back();
-                      },
-                      child: Chip(
-                        label: KMyText(myCtrl.createdTeams[i].teamName!),
-                        backgroundColor: Colors.white70,
-                        deleteIcon: const Icon(
-                          Icons.delete_forever,
-                          color: Colors.redAccent,
-                        ),
-                        onDeleted: () {},
-                      ),
-                    ),
+                  KTeamChip(
+                    onButtonTap: () async {
+                      await onSelect(myCtrl.createdTeams[i].teamCode!);
+                      myCtrl.currentTeamCode.value =
+                          myCtrl.createdTeams[i].teamCode!;
+                      Get.back();
+                    },
+                    onIconTap: () {},
+                    index: i,
+                    teamList: myCtrl.createdTeams,
+                    iconData: Icons.delete,
                   ),
+
                 const KVerticalSpace(),
                 // Joined team text
-                const KMyText(
-                  'Your joined teams',
-                  color: accentColor,
-                  weight: FontWeight.bold,
-                  size: 20,
+                const KTitleChip(
+                  label: 'My Joined Teams',
+                  iconData: Icons.group_add,
                 ),
                 for (var i = 0; i < myCtrl.joinedTeams.length; i++)
-                  Obx(
-                    () => InkWell(
-                      onTap: () async {
-                        await onSelect(myCtrl.joinedTeams[i].teamCode!);
-                        myCtrl.currentTeamCode.value =
-                            myCtrl.joinedTeams[i].teamCode!;
-                        Get.back();
-                      },
-                      child: Chip(
-                        label: KMyText(myCtrl.joinedTeams[i].teamName!),
-                        backgroundColor: Colors.white70,
-                        deleteButtonTooltipMessage: 'Leave',
-                        deleteIcon: const Icon(
-                          Icons.remove_circle_outline,
-                          color: Colors.redAccent,
-                        ),
-                        onDeleted: () {},
-                      ),
-                    ),
+                  KTeamChip(
+                    onButtonTap: () async {
+                      await onSelect(myCtrl.joinedTeams[i].teamCode!);
+                      myCtrl.currentTeamCode.value =
+                          myCtrl.joinedTeams[i].teamCode!;
+                      Get.back();
+                    },
+                    onIconTap: () {},
+                    index: i,
+                    teamList: myCtrl.joinedTeams,
+                    iconData: Icons.remove_circle,
                   ),
+
                 const KVerticalSpace(),
                 const Spacer(),
                 // Logout button
@@ -118,7 +119,29 @@ class DrawerContent extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    AwesomeDialog(
+                      context: context,
+                      title: 'Are you sure!!!',
+                      desc: 'You want to logout',
+                      dialogType: DialogType.question,
+                      reverseBtnOrder: true,
+                      btnCancel: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentColor,
+                        ),
+                        onPressed: () => Get.back(),
+                        child: const KMyText('Cancel', color: backgroundColor),
+                      ),
+                      btnOk: TextButton(
+                        onPressed: onLogout,
+                        child: const KMyText(
+                          'Continue',
+                          color: Colors.red,
+                        ),
+                      ),
+                    ).show();
+                  },
                   label: const KMyText('Logout', color: backgroundColor),
                   icon: const Icon(Icons.logout, color: backgroundColor),
                 ),

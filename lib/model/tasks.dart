@@ -19,8 +19,8 @@ class Tasks {
   factory Tasks.fromJson(Map<String, dynamic> json) {
     var dueDate = DateTime.parse(json['dueDate']);
     return Tasks(
-      taskTitle: json['taskTitle'],
-      taskDescription: json['taskDescription'],
+      taskTitle: json['title'],
+      taskDescription: json['description'],
       assignedTo: assignedToMember(json['assignedTo']),
       dueDate: Timestamp.fromDate(dueDate),
       isCompleted: json['isCompleted'],
@@ -30,7 +30,7 @@ class Tasks {
   static assignedToMember(var json) {
     return Members(
       name: json.first['name'],
-      userId: json.first['userID'],
+      userId: json.first['userId'],
     );
   }
 }

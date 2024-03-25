@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:myapp/model/created_teams.dart';
@@ -17,6 +18,7 @@ class MyController extends GetxController {
   var userData = UserData().obs;
   var joinedTeams = <JoinedTeams>[].obs;
   var createdTeams = <CreatedTeams>[].obs;
+  var currentUser = FirebaseAuth.instance.currentUser;
 
   //* These variables will change on team selection
   var currentTeamCode = ''.obs;
