@@ -29,12 +29,11 @@ class MyApp extends StatelessWidget {
 }
 
 
-/*
 
-TODO: Task actions, on edit, on delete, on complete.
-TODO: Chat
-TODO: Documents
-TODO: Progress bar
-TODO: On leave/ Delete team
+// TODO: Task actions, on edit, on delete, on complete.
+// TODO: Chat
+// TODO: Documents
+// TODO: Progress bar
+// TODO: On leave/ Delete team
 
- */
+// TODO: Notify user when task is assigned to them.

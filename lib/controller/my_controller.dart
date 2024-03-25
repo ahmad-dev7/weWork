@@ -14,11 +14,13 @@ late FirebaseServices services;
 
 class MyController extends GetxController {
   var showLoading = false.obs;
+  // For bottomNavigation bar
   var activeIndex = 0.obs;
   var userData = UserData().obs;
   var joinedTeams = <JoinedTeams>[].obs;
   var createdTeams = <CreatedTeams>[].obs;
   var currentUser = FirebaseAuth.instance.currentUser;
+
 
   //* These variables will change on team selection
   var currentTeamCode = ''.obs;

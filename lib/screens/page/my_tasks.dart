@@ -17,6 +17,12 @@ class MyTasks extends StatelessWidget {
           () => ListView.builder(
             itemCount: myCtrl.currentTeam.value.tasks!.length,
             itemBuilder: ((context, index) {
+              var dueDate = kFormatDate(
+                DateTime.fromMillisecondsSinceEpoch(
+                  myCtrl.currentTeam.value.tasks![index].dueDate!.seconds *
+                      1000,
+                ),
+              );
               return Visibility(
                 visible: myCtrl.isOwner.value ||
                     myCtrl.currentTeam.value.tasks![index].assignedTo!.userId ==
@@ -59,55 +65,48 @@ class MyTasks extends StatelessWidget {
                         ),
                       ),
                       // Icons and due date tile
-                      SizedBox(
-                        height: 40,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title: Visibility(
+                                visible: myCtrl.isOwner.value,
                                 child: KMyText(
-                                  "Due Date: ${kFormatDate(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                      myCtrl.currentTeam.value.tasks![index]
-                                              .dueDate!.seconds *
-                                          1000,
-                                    ),
-                                  )}",
-                                  weight: FontWeight.normal,
-                                  color: Colors.black54,
+                                  myCtrl.currentTeam.value.tasks![index]
+                                      .assignedTo!.name!,
                                 ),
                               ),
+                              subtitle: Text("Due Date: $dueDate"),
                             ),
-                            if (myCtrl.isOwner.value)
-                              IconButton.filled(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            const KHorizontalSpace(),
-                            if (myCtrl.isOwner.value)
-                              IconButton.filled(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            const KHorizontalSpace(),
+                          ),
+                          if (myCtrl.isOwner.value)
                             IconButton.filled(
                               onPressed: () {},
                               icon: const Icon(
-                                Icons.check,
-                                color: Colors.green,
+                                Icons.delete,
+                                color: Colors.red,
                               ),
                             ),
-                          ],
-                        ),
+                          const KHorizontalSpace(),
+                          if (myCtrl.isOwner.value)
+                            IconButton.filled(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          const KHorizontalSpace(),
+                          IconButton.filled(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.check,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
