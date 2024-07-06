@@ -6,6 +6,7 @@ import 'package:myapp/controller/my_controller.dart';
 import 'package:myapp/model/created_teams.dart';
 import 'package:myapp/model/joined_teams.dart';
 import 'package:myapp/model/members.dart';
+import 'package:myapp/model/tasks.dart';
 import 'package:myapp/model/teams.dart';
 import 'package:myapp/model/user_data.dart';
 
@@ -239,11 +240,7 @@ class FirebaseServices {
     print('Reached here---------------');
     try {
       var query = await allTeams.where('teamCode', isEqualTo: teamCode).get();
-
       myCtrl.currentTeam.value = Teams.fromJson(query.docs.first.data());
-      print('assigned value to current team');
-      print('--------------------------');
-      print('current team name: ${myCtrl.currentTeam.value.teamName}');
       return;
     } catch (exception) {
       print(exception);
@@ -280,6 +277,55 @@ class FirebaseServices {
     } catch (exception) {
       print(exception);
       return false;
+    }
+  }
+
+  //* Complete Task
+  Future completeTask(int index) async {
+    try {
+      var query = await allTeams
+          .where('teamCode', isEqualTo: myCtrl.currentTeamCode.value)
+          .get();
+
+      var taskDoc = query.docs.first;
+      var currentTask = taskDoc['tasks'];
+      currentTask[index]['isCompleted'] = true;
+      await taskDoc.reference.update({'tasks': currentTask});
+      getTeamData(myCtrl.currentTeamCode.value);
+      return true;
+    } catch (exception) {
+      print("Caused exception: $exception");
+      return false;
+    }
+  }
+
+  //* Edit Task
+  Future editTask(int i, Tasks task) async {
+    var title = task.taskTitle ?? myCtrl.currentTeam.value.tasks![i].taskTitle!;
+    var description = task.taskDescription ??
+        myCtrl.currentTeam.value.tasks![i].taskDescription!;
+    var assignedTo =
+        task.assignedTo ?? myCtrl.currentTeam.value.tasks![i].assignedTo;
+    var dueDate = task.dueDate ?? myCtrl.currentTeam.value.tasks![i].dueDate;
+    var isCompleted =
+        task.isCompleted ?? myCtrl.currentTeam.value.tasks![i].isCompleted;
+
+    print('Title: ## $title');
+    print('Description: ## $description');
+    print('Assigned to: ## $assignedTo');
+    print('Due Date: ## $dueDate');
+    print('isCompleted: ## $isCompleted');
+
+    try {
+      var query = await allTeams
+          .where('teamCode', isEqualTo: myCtrl.currentTeamCode.value)
+          .get();
+
+      var taskDoc = query.docs.first;
+      var currentTask = taskDoc['tasks'];
+      currentTask[i].add({'assignedTo': ''});
+    } catch (exception) {
+      print(exception);
     }
   }
 

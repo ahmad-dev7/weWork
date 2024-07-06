@@ -41,7 +41,7 @@ class DrawerContent extends StatelessWidget {
                 // Greet title
                 ListTile(
                   contentPadding: const EdgeInsets.all(0),
-                  title: KMyText('Hello, ${myCtrl.currentUser!.displayName}'),
+                  title: KMyText('Hello, ${currentUser!.displayName}'),
                   leading: const CircleAvatar(
                     backgroundColor: Colors.grey,
                   ),
@@ -53,9 +53,7 @@ class DrawerContent extends StatelessWidget {
                     localData.clear();
                     Get.to(() => const HomeScreen());
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: accentColor),
                   child: const KMyText(
                     'Create/Join Team',
                     color: backgroundColor,

@@ -35,5 +35,4 @@ class MyApp extends StatelessWidget {
 // TODO: Documents
 // TODO: Progress bar
 // TODO: On leave/ Delete team
-
 // TODO: Notify user when task is assigned to them.

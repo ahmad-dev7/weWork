@@ -21,7 +21,7 @@ class KTeamTile extends StatelessWidget {
       myCtrl.showLoading.value = true;
       await services.getTeamData(teamCode);
       myCtrl.isOwner.value =
-          myCtrl.currentTeam.value.ownerId == myCtrl.currentUser!.uid;
+          myCtrl.currentTeam.value.ownerId == currentUser!.uid;
       debugPrint('Is OWner of this team: ${myCtrl.isOwner}');
       myCtrl.showLoading.value = false;
     }

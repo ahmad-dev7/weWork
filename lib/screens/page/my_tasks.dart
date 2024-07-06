@@ -26,7 +26,7 @@ class MyTasks extends StatelessWidget {
               return Visibility(
                 visible: myCtrl.isOwner.value ||
                     myCtrl.currentTeam.value.tasks![index].assignedTo!.userId ==
-                        myCtrl.currentUser!.uid,
+                        currentUser!.uid,
                 child: Container(
                   margin: EdgeInsets.fromLTRB(
                     15,
@@ -81,8 +81,9 @@ class MyTasks extends StatelessWidget {
                               subtitle: Text("Due Date: $dueDate"),
                             ),
                           ),
+                          //* Delete task button
                           if (myCtrl.isOwner.value)
-                            IconButton.filled(
+                            IconButton(
                               onPressed: () {},
                               icon: const Icon(
                                 Icons.delete,
@@ -90,22 +91,34 @@ class MyTasks extends StatelessWidget {
                               ),
                             ),
                           const KHorizontalSpace(),
+                          //* Edit task button
                           if (myCtrl.isOwner.value)
-                            IconButton.filled(
-                              onPressed: () {},
+                            IconButton(
+                              onPressed: () {
+                                Get.bottomSheet(
+                                  Container(
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
                               icon: const Icon(
                                 Icons.edit,
                                 color: Colors.blue,
                               ),
                             ),
                           const KHorizontalSpace(),
-                          IconButton.filled(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.check,
-                              color: Colors.green,
+                          //* Complete task button
+                          if (!myCtrl
+                              .currentTeam.value.tasks![index].isCompleted!)
+                            IconButton(
+                              onPressed: () async {
+                                await services.completeTask(index);
+                              },
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.green,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ],
